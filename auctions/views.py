@@ -3,8 +3,9 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.forms import ModelForm
 
-from .models import User
+from .models import User, AuctionList
 
 
 def index(request):
@@ -61,3 +62,40 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+
+class AuctionListForm(ModelForm):
+    class Meta:
+        model = AuctionList
+        exclude = ['user']
+        #fields = ['name', 'image', 'description', 'bid', 'category']# 
+
+def create(request):
+    if request.method == "POST":
+        form = AuctionListForm(request.POST)
+        if form.is_valid:
+            #form.user = request.user
+            #form.save()#mirar la forma mas simple, aun que me he matado y no he llegado y al
+            #final he acado haciendo lo de abajo que en realidad lo podria hacerlo desdel principio
+            name = request.POST['name']
+            description = request.POST['description']
+            bid = request.POST['bid']
+            category = request.POST['category']
+            image = request.POST['image']
+            auctionCreated = AuctionList(
+                user=request.user,
+                name=name, 
+                description=description, 
+                bid=bid,
+                category=category,
+                image=image,
+            )
+            auctionCreated.save()
+            return HttpResponseRedirect(reverse('index'))
+        else:
+            return render(request, "auctions/create.html",{
+                "auction": form
+            })
+    else:
+        return render(request, "auctions/create.html", {
+            "auction": AuctionListForm()
+            })

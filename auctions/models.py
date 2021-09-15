@@ -23,7 +23,7 @@ class AuctionList(models.Model):
     bid = models.FloatField()#starting big
 
     def __str__(self):
-        return f"ARTICLE: {self.id} NAME: {self.name} SELLER: {self.user}"
+        return f"ARTICLE: {self.id}, NAME: {self.name}, SELLER: {self.user}"
 
 class Bid(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
