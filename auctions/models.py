@@ -15,7 +15,7 @@ class AuctionList(models.Model):
     ('NO', 'No category')
     ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    category = models.CharField(max_length=100, choices=CATEGORY_CHOICES)
+    category = models.CharField(max_length=100, choices=CATEGORY_CHOICES, default='NO')
     
     image = models.URLField()
     name = models.CharField(max_length=100)
