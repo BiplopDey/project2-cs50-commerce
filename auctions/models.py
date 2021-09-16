@@ -1,10 +1,8 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-
 class User(AbstractUser):
     pass
-
 
 class AuctionList(models.Model):
     CATEGORY_CHOICES = [
@@ -33,3 +31,10 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     auction = models.ForeignKey(AuctionList, on_delete=models.CASCADE)
     comment = models.TextField()
+
+class Watchlist(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    watchlist = models.ForeignKey(AuctionList, on_delete=models.CASCADE, related_name="interested")
+
+    def __str__(self):
+        return f"Auction: {self.watchlist}, User:{self.user}"

@@ -6,7 +6,13 @@
     {{auction.description}}
     <h4>{{auction.bid}}€</h2>
     
-    
+    {% if user.is_authenticated %}
+        <form action="{% url 'listing' auction_id=auction.id %}" method="POST">
+            {% csrf_token %}
+            <input type="submit" name="watchlist" value="Add to watchlist">
+        </form>
+    {% endif %}
+
     <h5>Details</h5>
     <ul>
         <li>Listed by: {{auction.name}} </li>

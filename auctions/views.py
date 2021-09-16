@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.forms import ModelForm
 
-from .models import User, AuctionList
+from .models import User, AuctionList, Watchlist
 
 
 def index(request):
@@ -74,6 +74,7 @@ class AuctionListForm(ModelForm):
         exclude = ['user']
         #fields = ['name', 'image', 'description', 'bid', 'category']
 
+#@login_required, poner login decorator
 def create(request):
     if request.method == "POST":
         form = AuctionListForm(request.POST)
@@ -94,8 +95,16 @@ def create(request):
             "auction": AuctionListForm()
             })
 
-def listing(request, auction_id):
+def listing(request, auction_id):#muestra el item seleccionado
     auction = AuctionList.objects.get(pk=auction_id)
-    return render(request, "auctions/listing.html", {
-        "auction": auction
-    })
+    if request.method == 'POST':
+        if 'watchlist' in request.POST:
+            w = Watchlist(user=request.user, watchlist = auction)
+            w.save()
+            return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
+        return HttpResponseRedirect(reverse('index'))
+    else:
+        return render(request, "auctions/listing.html", {
+            "auction": auction
+        })
+
