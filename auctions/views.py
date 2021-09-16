@@ -67,29 +67,18 @@ class AuctionListForm(ModelForm):
     class Meta:
         model = AuctionList
         exclude = ['user']
-        #fields = ['name', 'image', 'description', 'bid', 'category']# 
+        #fields = ['name', 'image', 'description', 'bid', 'category']
 
 def create(request):
     if request.method == "POST":
         form = AuctionListForm(request.POST)
         if form.is_valid:
-            #form.user = request.user
-            #form.save()#mirar la forma mas simple, aun que me he matado y no he llegado y al
-            #final he acado haciendo lo de abajo que en realidad lo podria hacerlo desdel principio
-            name = request.POST['name']
-            description = request.POST['description']
-            bid = request.POST['bid']
-            category = request.POST['category']
-            image = request.POST['image']
-            auctionCreated = AuctionList(
-                user=request.user,
-                name=name, 
-                description=description, 
-                bid=bid,
-                category=category,
-                image=image,
-            )
-            auctionCreated.save()
+            auctionItem = form.save(commit=False)
+            # commit=False tells Django that "Don't send this to database yet.
+            # I have more things I want to do with it.")
+
+            auctionItem.user = request.user # Set the user object here
+            auctionItem.save() # Now you can send it to DB
             return HttpResponseRedirect(reverse('index'))
         else:
             return render(request, "auctions/create.html",{
