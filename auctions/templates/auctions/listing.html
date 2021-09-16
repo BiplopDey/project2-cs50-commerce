@@ -7,7 +7,7 @@
     <h4>{{auction.bid}}€</h2>
     
         
-        {% if not is_in_watchlist %}
+        {% if display %}
             <a href="{% url 'addListing' auction_id=auction.id %}">
                 Add to watchlist
             </a>

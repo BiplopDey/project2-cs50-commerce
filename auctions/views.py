@@ -1,10 +1,11 @@
-import auctions
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.forms import ModelForm
+from django.contrib.auth.decorators import login_required
 
 from .models import User, AuctionList, Watchlist
 
@@ -96,13 +97,17 @@ def create(request):
 
 def listing(request, auction_id):#muestra el item seleccionado
     auction = AuctionList.objects.get(pk=auction_id)
-    is_in_watchlist = auction.interested.all().filter(user=request.user).exists()
+    display = True
+    if(request.user.is_authenticated):
+        #if user has the item in his watchlist dont display "add watchlist", ie display=false
+        display = not auction.interested.all().filter(user=request.user).exists()
+    
     return render(request, "auctions/listing.html", {
         "auction": auction,
-        'is_in_watchlist': is_in_watchlist
+        'display': display
     })
 
-
+@login_required
 def addWatchlist(request, auction_id):
      
     if (AuctionList.objects.filter(pk=auction_id).exists()):
