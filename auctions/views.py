@@ -97,9 +97,10 @@ def create(request):
 
 def listing(request, auction_id):#muestra el item seleccionado
     auction = AuctionList.objects.get(pk=auction_id)
-    display = True
+    display = True # si no esta logeado
     if(request.user.is_authenticated):
         #if user has the item in his watchlist dont display "add watchlist", ie display=false
+        #si ya existe auction en watchlist entoces display=False
         display = not auction.interested.all().filter(user=request.user).exists()
     
     return render(request, "auctions/listing.html", {
@@ -114,6 +115,17 @@ def addWatchlist(request, auction_id):
         auction = AuctionList.objects.get(pk=auction_id)
         w = Watchlist(user=request.user, watchlist = auction)
         w.save()
+        return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
+    else:
+        return HttpResponse('Item Not found')
+
+
+@login_required
+def removeWatchlist(request, auction_id):
+     
+    if (AuctionList.objects.filter(pk=auction_id).exists()):
+        auction = AuctionList.objects.get(pk=auction_id)
+        Watchlist.objects.filter(user=request.user, watchlist = auction).delete()
         return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
     else:
         return HttpResponse('Item Not found')
