@@ -1,3 +1,8 @@
 body {
     padding: 10px;
 }
+
+.auction{
+    border: 3px solid black;
+    margin: 10px;
+}

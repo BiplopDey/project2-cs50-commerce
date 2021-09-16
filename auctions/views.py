@@ -1,3 +1,4 @@
+import auctions
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -9,7 +10,11 @@ from .models import User, AuctionList
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    auctions = AuctionList.objects.all()
+
+    return render(request, "auctions/index.html",{
+        'auctions': auctions
+    })
 
 
 def login_view(request):
