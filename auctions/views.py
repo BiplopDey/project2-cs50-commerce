@@ -8,7 +8,6 @@ from django.forms import ModelForm
 
 from .models import User, AuctionList, Watchlist
 
-
 def index(request):
     auctions = AuctionList.objects.all()
 
@@ -97,14 +96,20 @@ def create(request):
 
 def listing(request, auction_id):#muestra el item seleccionado
     auction = AuctionList.objects.get(pk=auction_id)
-    if request.method == 'POST':
-        if 'watchlist' in request.POST:
-            w = Watchlist(user=request.user, watchlist = auction)
-            w.save()
-            return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
-        return HttpResponseRedirect(reverse('index'))
-    else:
-        return render(request, "auctions/listing.html", {
-            "auction": auction
-        })
+    is_in_watchlist = auction.interested.all().filter(user=request.user).exists()
+    return render(request, "auctions/listing.html", {
+        "auction": auction,
+        'is_in_watchlist': is_in_watchlist
+    })
 
+
+def addWatchlist(request, auction_id):
+     
+    if (AuctionList.objects.filter(pk=auction_id).exists()):
+        auction = AuctionList.objects.get(pk=auction_id)
+        w = Watchlist(user=request.user, watchlist = auction)
+        w.save()
+        return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
+    else:
+        return HttpResponse('Item Not found')
+    
