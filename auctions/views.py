@@ -1,6 +1,7 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
+from django.db.models import fields
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -77,7 +78,7 @@ class AuctionListForm(ModelForm):
 class BidForm(ModelForm):
     class Meta:
         model = Bid
-        exclude = ['user']
+        fields = ['bid']
 
 #@login_required, poner login decorator
 def create(request):
@@ -140,5 +141,5 @@ def removeWatchlist(request, auction_id):
 @login_required
 def bid(request, auction_id):
     if (request.method=='POST'):
-        pass
+        
     
