@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.forms import ModelForm
 from django.contrib.auth.decorators import login_required
 
-from .models import User, AuctionList, Watchlist
+from .models import User, AuctionList, Watchlist, Bid
 
 def index(request):
     auctions = AuctionList.objects.all()
@@ -74,6 +74,11 @@ class AuctionListForm(ModelForm):
         exclude = ['user']
         #fields = ['name', 'image', 'description', 'bid', 'category']
 
+class BidForm(ModelForm):
+    class Meta:
+        model = Bid
+        exclude = ['user']
+
 #@login_required, poner login decorator
 def create(request):
     if request.method == "POST":
@@ -105,7 +110,8 @@ def listing(request, auction_id):#muestra el item seleccionado
     
     return render(request, "auctions/listing.html", {
         "auction": auction,
-        'display': display
+        'display': display,
+        'bid': BidForm()
     })
 
 @login_required
@@ -129,4 +135,10 @@ def removeWatchlist(request, auction_id):
         return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
     else:
         return HttpResponse('Item Not found')
+    
+
+@login_required
+def bid(request, auction_id):
+    if (request.method=='POST'):
+        pass
     

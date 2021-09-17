@@ -6,8 +6,6 @@
     {{auction.description}}
     <h4>{{auction.bid}}€</h2>
     
-        
-        
         {% if display %}
             <a href="{% url 'addListing' auction_id=auction.id %}">
                 Add to watchlist
@@ -17,8 +15,9 @@
                 Remove from watchlist
             </a>
         {% endif %}
-            
-
+        
+        {{bid}}
+        
     <h5>Details</h5>
     <ul>
         <li>Listed by: {{auction.name}} </li>
