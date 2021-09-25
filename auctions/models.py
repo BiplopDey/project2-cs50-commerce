@@ -33,6 +33,8 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     auction = models.ForeignKey(AuctionList, on_delete=models.CASCADE)
     comment = models.TextField()
+    date = models.DateTimeField() # hay que importrar datetime, y luego se pone datetime.datetime.now()
+    # y salen el tiempo hasta en segundos
 
 class Watchlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
