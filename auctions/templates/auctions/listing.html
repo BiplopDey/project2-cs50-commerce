@@ -4,7 +4,7 @@
     <h3>Listing: {{auction.name}}</h2>
     <img src="{{auction.image}}" alt="Auction image" width="300">
     {{auction.description}}
-    <h4>{{auction.bid}}€</h2>
+    <h4>{{current_bid}}€</h2>
     
         <form action="{% url 'watchlist' auction_id=auction.id %}" method="POST">
             {% csrf_token %}
@@ -18,12 +18,19 @@
             {% endif %}
         </form>
         
+        <form action="{% url 'bid' auction_id=auction.id %}" method="POST">
+            {% csrf_token %}
+            {% if your_bid_current %}
+                Your bid is the current bid
+            {% endif %}
+            {{bid}}
+            <input type="submit" value="Place Bid">
+        </form>
         
-        {{bid}}
         
     <h5>Details</h5>
     <ul>
         <li>Listed by: {{auction.name}} </li>
-        <li>Category: {{auction.category}} <h5>Mirar de arreglar esto</h5> </li> 
+        <li>Category: {{ auction.get_category_display }} <h5>Mirar de arreglar esto</h5> </li> 
     </ul>
 {% endblock %}

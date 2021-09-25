@@ -84,7 +84,7 @@ class BidForm(ModelForm):
 def create(request):
     if request.method == "POST":
         form = AuctionListForm(request.POST)
-        if form.is_valid:
+        if form.is_valid():
             auctionItem = form.save(commit=False)
             # commit=False tells Django that "Don't send this to database yet.
             # I have more things I want to do with it.")
@@ -109,10 +109,17 @@ def listing(request, auction_id):#muestra el item seleccionado
         #si ya existe auction en watchlist entoces display=False
         display = not auction.interested.all().filter(user=request.user).exists()
     
+    current_bid=auction.bid
+    bidding = Bid.objects.filter(auction=auction_id).first()
+    if(bidding):
+        current_bid = bidding.bid
+
     return render(request, "auctions/listing.html", {
         "auction": auction,
         'display': display,
-        'bid': BidForm()
+        'bid': BidForm(),
+        'your_bid_current': Bid.objects.filter(user = request.user, auction = auction).exists(),
+        'current_bid': current_bid
     })
 
 @login_required
@@ -122,8 +129,8 @@ def watchlist(request, auction_id):
             auction = AuctionList.objects.get(pk=auction_id)
             Watchlist.objects.create(user=request.user, auction = auction)
         elif (request.POST['watchlist']=='remove'):
-            auction = AuctionList.objects.get(pk=auction_id)
-            Watchlist.objects.get(user=request.user, auction = auction).delete()
+            #auction = AuctionList.objects.get(pk=auction_id)
+            Watchlist.objects.get(user=request.user, auction = auction_id).delete()
         else:
             return HttpResponse('Internal Error')#poner algun error
 
@@ -140,4 +147,23 @@ def watchlist(request, auction_id):
 
 @login_required
 def bid(request, auction_id):
-    pass
+    if (request.method=='POST'):
+        form = BidForm(request.POST)
+        if (form.is_valid()):
+            user_bid = form.cleaned_data["bid"]
+            #bucar la puja segun auction, he usado filter porque en get si no existe da error
+            bidding = Bid.objects.filter(auction=auction_id).first()
+            if(bidding):#si existe el bid
+                if(user_bid>bidding.bid):
+                    bidding.user = request.user
+                    bidding.bid = user_bid
+                    bidding.save()#hacer el update
+                #poner error si no cumple
+            else:#como no existe comprovamos que user_bid es mayor que es starting bid
+                auction = AuctionList.objects.get(pk=auction_id)
+                if(user_bid>auction.bid):#si cumple crear bid
+                    Bid.objects.create(user = request.user, bid = user_bid, auction = auction)
+        else:
+            return HttpResponse('Wrong bid')#hacer que salga algun mensaje de error
+    
+    return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
