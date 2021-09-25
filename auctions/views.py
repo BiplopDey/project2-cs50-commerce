@@ -116,7 +116,7 @@ def listing(request, auction_id):#muestra el item seleccionado
     })
 
 @login_required
-def addWatchlist(request, auction_id):
+def watchlist(request, auction_id):
      
     if (AuctionList.objects.filter(pk=auction_id).exists()):
         auction = AuctionList.objects.get(pk=auction_id)
@@ -140,6 +140,4 @@ def removeWatchlist(request, auction_id):
 
 @login_required
 def bid(request, auction_id):
-    if (request.method=='POST'):
-        
-    
+    pass
