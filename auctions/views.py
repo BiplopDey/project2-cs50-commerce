@@ -120,7 +120,7 @@ def watchlist(request, auction_id):
      
     if (AuctionList.objects.filter(pk=auction_id).exists()):
         auction = AuctionList.objects.get(pk=auction_id)
-        w = Watchlist(user=request.user, watchlist = auction)
+        w = Watchlist(user=request.user, auction = auction)
         w.save()
         return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
     else:
@@ -132,7 +132,7 @@ def removeWatchlist(request, auction_id):
      
     if (AuctionList.objects.filter(pk=auction_id).exists()):
         auction = AuctionList.objects.get(pk=auction_id)
-        Watchlist.objects.filter(user=request.user, watchlist = auction).delete()
+        Watchlist.objects.filter(user=request.user, auction = auction).delete()
         return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
     else:
         return HttpResponse('Item Not found')
