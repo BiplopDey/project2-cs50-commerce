@@ -29,7 +29,7 @@ class Bid(models.Model):#guarda al mejor postor
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     bid = models.FloatField()#current_bid
     #ahora si se la auction puedo saver los que han subastado
-    auction = models.ForeignKey(AuctionList, on_delete=models.CASCADE, related_name='bidders', default=None, unique=True)
+    auction = models.ForeignKey(AuctionList, on_delete=models.CASCADE, related_name='bidders', default=None)
 
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)

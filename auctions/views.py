@@ -117,25 +117,25 @@ def listing(request, auction_id):#muestra el item seleccionado
 
 @login_required
 def watchlist(request, auction_id):
-     
-    if (AuctionList.objects.filter(pk=auction_id).exists()):
-        auction = AuctionList.objects.get(pk=auction_id)
-        w = Watchlist(user=request.user, auction = auction)
-        w.save()
-        return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
-    else:
-        return HttpResponse('Item Not found')
+    if(request.method == 'POST'):
+        if (request.POST['watchlist']=='add'):
+            auction = AuctionList.objects.get(pk=auction_id)
+            Watchlist.objects.create(user=request.user, auction = auction)
+        elif (request.POST['watchlist']=='remove'):
+            auction = AuctionList.objects.get(pk=auction_id)
+            Watchlist.objects.get(user=request.user, auction = auction).delete()
+        else:
+            return HttpResponse('Internal Error')#poner algun error
 
+    return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
 
-@login_required
-def removeWatchlist(request, auction_id):
-     
-    if (AuctionList.objects.filter(pk=auction_id).exists()):
-        auction = AuctionList.objects.get(pk=auction_id)
-        Watchlist.objects.filter(user=request.user, auction = auction).delete()
-        return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
-    else:
-        return HttpResponse('Item Not found')
+# def removeWatchlist(request, auction_id):
+#     if (AuctionList.objects.filter(pk=auction_id).exists()):
+#         auction = AuctionList.objects.get(pk=auction_id)
+#         Watchlist.objects.filter(user=request.user, auction = auction).delete()
+#         return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
+#     else:
+#         return HttpResponse('Item Not found')
     
 
 @login_required
