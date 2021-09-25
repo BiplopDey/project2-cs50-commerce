@@ -72,7 +72,7 @@ def register(request):
 class AuctionListForm(ModelForm):
     class Meta:
         model = AuctionList
-        exclude = ['user']
+        exclude = ['user', 'date', 'closed']
         #fields = ['name', 'image', 'description', 'bid', 'category']
 
 class BidForm(ModelForm):
