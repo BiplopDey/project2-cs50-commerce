@@ -12,6 +12,8 @@ class AuctionList(models.Model):
     ('HG','Higiene'),
     ('NO', 'No category')
     ]
+    values=[i[0] for i in CATEGORY_CHOICES]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)# no guarda el id sino el user
     category = models.CharField(max_length=100, choices=CATEGORY_CHOICES, default='NO')
     
@@ -46,6 +48,6 @@ class Comment(models.Model):
 class Watchlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     auction = models.ForeignKey(AuctionList, on_delete=models.CASCADE, related_name="interested")
-    
+
     def __str__(self):
         return f"Auction: {self.watchlist}, User:{self.user}"

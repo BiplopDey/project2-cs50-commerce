@@ -1,8 +1,14 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
-    
+    <h2>Select Category</h2>
+
+    <form action="{% url 'category' cat='home'%}" method="POST">
+        {% csrf_token %}
+        {{form}}
+        <input type="submit" value="search">
+    </form>
+
     {% for auction in auctions %}
             <a href="{% url 'listing' auction_id=auction.id %}">    
                 <div class="auction" style="border: 3px solid black; margin: 10px;">
@@ -20,5 +26,7 @@
         {% empty %}
             <h5>No items</h5>
     {% endfor %}
+    
+    
     
 {% endblock %}

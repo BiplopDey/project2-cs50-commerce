@@ -1,3 +1,4 @@
+import auctions
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
@@ -7,7 +8,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.forms import ModelForm
 from django.contrib.auth.decorators import login_required
-
+from django import forms
 from .models import User, AuctionList, Watchlist, Bid
 
 def index(request):
@@ -176,3 +177,32 @@ def bid(request, auction_id):
             return HttpResponse('Wrong bid')#hacer que salga algun mensaje de error
     
     return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
+
+class CategoryForm(forms.Form):
+    category = forms.ChoiceField(choices=AuctionList.CATEGORY_CHOICES)
+
+
+def category(request, cat):
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            category = form.cleaned_data["category"]
+            return render(request, "auctions/category.html",{
+                'form': CategoryForm(),
+                'auctions': AuctionList.objects.filter(category = category),
+            } )
+        else:
+            return render(request, "auctions/category.html",{
+            'form': form,
+        })
+
+    if cat=="home":
+        return render(request, "auctions/category.html",{
+            'form': CategoryForm(),
+        })
+    elif cat not in AuctionList.values:
+        return HttpResponseRedirect(reverse('category', args=("home",)))
+    
+    
+
+    
