@@ -9,13 +9,15 @@ from django.urls import reverse
 from django.forms import ModelForm
 from django.contrib.auth.decorators import login_required
 from django import forms
-from .models import User, AuctionList, Watchlist, Bid
+from .models import Comment, User, AuctionList, Watchlist, Bid
+import datetime
 
 def index(request):
     auctions = AuctionList.objects.all()
 
     return render(request, "auctions/index.html",{
         'auctions': auctions
+        
     })
 
 
@@ -81,6 +83,11 @@ class BidForm(ModelForm):
         model = Bid
         fields = ['bid']
 
+class CommentForm(ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['comment']
+
 #@login_required, poner login decorator
 def create(request):
     if request.method == "POST":
@@ -90,6 +97,7 @@ def create(request):
             # commit=False tells Django that "Don't send this to database yet.
             # I have more things I want to do with it.")
 
+            auctionItem.date = datetime.datetime.now()
             auctionItem.user = request.user # Set the user object here
             auctionItem.save() # Now you can send it to DB
             return HttpResponseRedirect(reverse('index'))
@@ -109,7 +117,7 @@ def listing(request, auction_id):#muestra el item seleccionado
         auction.save()
         return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
 
-    #display add
+    #display add watchlist
     display = True # si no esta logeado
     if(request.user.is_authenticated):
         #if user has the item in his watchlist dont display "add watchlist", ie display=false
@@ -130,6 +138,8 @@ def listing(request, auction_id):#muestra el item seleccionado
         #mostrar el boton de cerrar solo para el creador
         'creatorAuction': auction.user == request.user,
         'bidding': bidding,
+        'comment': CommentForm(),
+        'comments': auction.comments.all()
     })
 
 @login_required
@@ -153,13 +163,13 @@ def watchlist(request, auction_id):
 #         return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
 #     else:
 #         return HttpResponse('Item Not found')
-    
+
 
 @login_required
 def bid(request, auction_id):
     if (request.method=='POST'):
         form = BidForm(request.POST)
-        if (form.is_valid()):
+        if form.is_valid():
             user_bid = form.cleaned_data["bid"]
             #bucar la puja segun auction, he usado filter porque en get si no existe da error
             bidding = Bid.objects.filter(auction=auction_id).first()
@@ -183,26 +193,39 @@ class CategoryForm(forms.Form):
 
 
 def category(request, cat):
+    
     if request.method == 'POST':
         form = CategoryForm(request.POST)
         if form.is_valid():
             category = form.cleaned_data["category"]
-            return render(request, "auctions/category.html",{
-                'form': CategoryForm(),
-                'auctions': AuctionList.objects.filter(category = category),
-            } )
+            return HttpResponseRedirect(reverse('category', args=(category,)))
         else:
             return render(request, "auctions/category.html",{
             'form': form,
         })
 
-    if cat=="home":
+    if cat in AuctionList.values:
+        return render(request, "auctions/category.html",{
+                'form': CategoryForm(),
+                'auctions': AuctionList.objects.filter(category = cat),
+            } )
+    else:
         return render(request, "auctions/category.html",{
             'form': CategoryForm(),
         })
-    elif cat not in AuctionList.values:
-        return HttpResponseRedirect(reverse('category', args=("home",)))
-    
-    
 
+@login_required
+def comment(request, auction_id):
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.cleaned_data['comment']
+            Comment.objects.create(
+                user=request.user,
+                auction=AuctionList.objects.get(pk=auction_id),
+                comment = comment,
+                date = datetime.datetime.now()
+            )
+    
+    return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
     

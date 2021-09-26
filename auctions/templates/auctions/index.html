@@ -2,7 +2,8 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-    
+    {% block form%}
+    {% endblock %}
     {% for auction in auctions %}
             <a href="{% url 'listing' auction_id=auction.id %}">    
                 <div class="auction" style="border: 3px solid black; margin: 10px;">
@@ -13,6 +14,9 @@
                         </li>
                         <li>
                             Price: {{auction.bid}}€
+                        </li>
+                        <li>
+                            {{auction.date}}
                         </li>
                     </ul>
                 </div>
