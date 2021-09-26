@@ -37,10 +37,15 @@ class Comment(models.Model):
     comment = models.TextField()
     date = models.DateTimeField() # hay que importrar datetime, y luego se pone datetime.datetime.now()
     # y salen el tiempo hasta en segundos
+    class Meta:
+        indexes = [
+            models.Index(fields=['auction', 'date']),
+            models.Index(fields=['date']),
+        ]
 
 class Watchlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     auction = models.ForeignKey(AuctionList, on_delete=models.CASCADE, related_name="interested")
-
+    
     def __str__(self):
         return f"Auction: {self.watchlist}, User:{self.user}"
