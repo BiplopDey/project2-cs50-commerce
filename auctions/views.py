@@ -103,6 +103,12 @@ def create(request):
 
 def listing(request, auction_id):#muestra el item seleccionado
     auction = AuctionList.objects.get(pk=auction_id)
+    if(request.method=='POST'):#si se cierra el auction
+        auction.closed = True
+        auction.save()
+        return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
+
+    #display add
     display = True # si no esta logeado
     if(request.user.is_authenticated):
         #if user has the item in his watchlist dont display "add watchlist", ie display=false
@@ -119,7 +125,10 @@ def listing(request, auction_id):#muestra el item seleccionado
         'display': display,
         'bid': BidForm(),
         'your_bid_current': Bid.objects.filter(user = request.user, auction = auction).exists(),
-        'current_bid': current_bid
+        'current_bid': current_bid,
+        #mostrar el boton de cerrar solo para el creador
+        'creatorAuction': auction.user == request.user,
+        'bidding': bidding,
     })
 
 @login_required

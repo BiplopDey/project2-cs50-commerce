@@ -4,33 +4,43 @@
     <h3>Listing: {{auction.name}}</h2>
     <img src="{{auction.image}}" alt="Auction image" width="300">
     {{auction.description}}
-    <h4>{{current_bid}}€</h2>
-    
-        <form action="{% url 'watchlist' auction_id=auction.id %}" method="POST">
-            {% csrf_token %}
 
-            {% if display %}
-                <input type="submit" value="Add to watchlist">
-                <input type="hidden" name="watchlist" value="add">
-            {% else %}
-                <input type="submit" value="Remove from watchlist">
-                <input type="hidden" name="watchlist" value="remove">
-            {% endif %}
-        </form>
-        
-        <form action="{% url 'bid' auction_id=auction.id %}" method="POST">
-            {% csrf_token %}
-            {% if your_bid_current %}
-                Your bid is the current bid
-            {% endif %}
-            {{bid}}
-            <input type="submit" value="Place Bid">
-        </form>
-        
+    <form action="{% url 'watchlist' auction_id=auction.id %}" method="POST">
+        {% csrf_token %}
+
+        {% if display %}
+            <input type="submit" value="Add to watchlist">
+            <input type="hidden" name="watchlist" value="add">
+        {% else %}
+            <input type="submit" value="Remove from watchlist">
+            <input type="hidden" name="watchlist" value="remove">
+        {% endif %}
+    </form>
+    
+    <h4>{{current_bid}}€</h2>
+
+        {% if auction.closed %}
+            Auction closed. Winner: {{bidding.user|default:"No winner"}}
+        {% else %}
+            <form action="{% url 'bid' auction_id=auction.id %}" method="POST">
+                {% csrf_token %}
+                {% if your_bid_current %}
+                    Your bid is the current bid
+                {% endif %}
+                {{bid}}
+                <input type="submit" value="Place Bid">
+            </form>
+            {% if creatorAuction %}
+                <form action="{% url 'listing' auction.id %}" method="POST">
+                    {% csrf_token%}
+                    <input type="submit" value="Close Bid">
+                </form>
+            {% endif%}
+        {% endif %}
         
     <h5>Details</h5>
     <ul>
-        <li>Listed by: {{auction.name}} </li>
-        <li>Category: {{ auction.get_category_display }} <h5>Mirar de arreglar esto</h5> </li> 
+        <li>Listed by: {{auction.user}} </li>
+        <li>Category: {{ auction.get_category_display }} </li> 
     </ul>
 {% endblock %}
