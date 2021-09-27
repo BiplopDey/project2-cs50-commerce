@@ -16,8 +16,8 @@ def index(request):
     auctions = AuctionList.objects.all()
 
     return render(request, "auctions/index.html",{
-        'auctions': auctions
-        
+        'auctions': auctions,
+        'message': "Active Listing",
     })
 
 
@@ -208,6 +208,7 @@ def category(request, cat):
         return render(request, "auctions/category.html",{
                 'form': CategoryForm(),
                 'auctions': AuctionList.objects.filter(category = cat),
+                'message': "Category"
             } )
     else:
         return render(request, "auctions/category.html",{
@@ -229,3 +230,9 @@ def comment(request, auction_id):
     
     return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
     
+@login_required
+def user_watchlist(request):
+    return render(request, "auctions/index.html",{
+        'message': "Watchlist",
+        'auctions': [w.auction for w in Watchlist.objects.filter(user=request.user)]#se puede buscar en django o hacer un lapply
+    })
