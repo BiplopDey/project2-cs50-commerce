@@ -4,7 +4,10 @@
     <h2>Create an Auction</h2>
     <form action="{% url 'create' %}" method="POST">
         {% csrf_token %}
-         {{ auction }}
+        
+            {{ auction }}
+        
+         
         <input type="submit">
     </form>
 {% endblock %}

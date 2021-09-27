@@ -103,12 +103,12 @@ def create(request):
             return HttpResponseRedirect(reverse('index'))
         else:
             return render(request, "auctions/create.html",{
-                "auction": form
+                "auction": form.as_ul()
             })
-    else:
-        return render(request, "auctions/create.html", {
-            "auction": AuctionListForm()
-            })
+    
+    return render(request, "auctions/create.html", {
+            "auction": AuctionListForm().as_p()
+        })
 
 def listing(request, auction_id):#muestra el item seleccionado
     auction = AuctionList.objects.get(pk=auction_id)
@@ -150,20 +150,11 @@ def watchlist(request, auction_id):
             Watchlist.objects.create(user=request.user, auction = auction)
         elif (request.POST['watchlist']=='remove'):
             #auction = AuctionList.objects.get(pk=auction_id)
-            Watchlist.objects.get(user=request.user, auction = auction_id).delete()
+            Watchlist.objects.get(auction = auction_id).delete()
         else:
             return HttpResponse('Internal Error')#poner algun error
 
     return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
-
-# def removeWatchlist(request, auction_id):
-#     if (AuctionList.objects.filter(pk=auction_id).exists()):
-#         auction = AuctionList.objects.get(pk=auction_id)
-#         Watchlist.objects.filter(user=request.user, auction = auction).delete()
-#         return HttpResponseRedirect(reverse('listing', args=(auction_id,)))
-#     else:
-#         return HttpResponse('Item Not found')
-
 
 @login_required
 def bid(request, auction_id):
